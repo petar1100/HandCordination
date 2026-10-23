@@ -1,43 +1,122 @@
-# 🎮 Minecraft Hand Gesture Controller
+# Minecraft контрола со гестови на рацете
 
-Control Minecraft using your hands and a webcam! This Python script leverages **MediaPipe** and **OpenCV** to track your hand landmarks, mapping real-time hand movements and gestures into direct keyboard and mouse controls. It features custom hardware-level mouse injection to bypass camera locking engines typical in 3D games like Minecraft.
+Python програма која ти овозможува да играш Minecraft само со рацете пред веб-камерата, без тастатура и глувче. Левата рака служи за движење и акции, а десната рака за гледање наоколу (глувче) и менување на слотот во hotbar-от.
 
----
-
-## ✨ Features
-
-* **Dual-Hand Layout:** Separate tracking for player movement/actions (Left hand) and looking around (Right hand).
-* **DirectInput Bypass:** Uses hardware-level Win32 API calls (`mouse_event`) to allow 360° fluid camera look inside Minecraft.
-* **Jitter Reduction:** Features a built-in dead zone filter and linear smoothing configurations for stable aiming.
-* **Live HUD:** On-screen OpenCV display visualizing your current gesture, directional tracking vectors, and tracking status.
+Програмата користи **MediaPipe** за препознавање на рацете, **OpenCV** за камерата и приказот на екран и **pynput** за симулирање на тастатура и глувче.
 
 ---
 
-## 🖐️ Gesture Mapping Guide
+## Барања
 
-| Hand | Gesture | Action mapped in Game |
-| :--- | :--- | :--- |
-| **Right Hand** | ☝️ Point Index Finger | **Mouse Look** (Move camera by moving finger) |
-| **Left Hand** | ☝️ Index Pointing UP | **Move Forward** (`W`) |
-| **Left Hand** | ✌️ Index + Middle UP | **Move Backward** (`S`) |
-| **Left Hand** | 👉 Index Pointing RIGHT | **Strafe Right** (`D`) |
-| **Left Hand** | 👈 Index + Middle RIGHT | **Strafe Left** (`A`) |
-| **Left Hand** | 👍 Thumbs UP | **Jump** (`Spacebar`) |
-| **Left Hand** | 🤙 Thumb + Pinky UP | **Sneak** (`Shift`) |
-| **Left Hand** | 🤘 Index + Pinky UP | **Break / Attack** (`Left Click Hold`) |
-| **Left Hand** | 🖕 Pinky Only UP | **Build / Use Item** (`Right Click Hold`) |
-| **Left Hand** | 🖐️ Open Hand | **Toggle Inventory** (`E` - Cooldown enabled) |
-| **Left Hand** | 👊 Closed Fist / Rest | **Stop all movement / inputs** |
+- **Windows** (поместувањето на глувчето за гледање користи Windows API)
+- **Python 3.9 – 3.12**
+- Веб-камера
+- Minecraft: Java Edition
 
----
-
-## 🚀 Getting Started
-
-### 1. Prerequisites
-This script requires **Windows** (due to the Win32 mouse event injection) and a working **webcam**.
-
-### 2. Installation
-Clone this repository or save the script file, then install the required dependencies using pip:
+## Инсталација
 
 ```bash
-pip install opencv-python mediapipe pynput pyautogui
+pip install opencv-python mediapipe pynput
+```
+
+## Стартување
+
+1. Вклучи го Minecraft и влези во свет.
+2. Стартувај ја програмата:
+   ```bash
+   python minecraft_gestures.py
+   ```
+3. Кликни назад во прозорецот на Minecraft, за притисоците на копчињата да одат во играта.
+4. Застани пред камерата така што двете раце ќе се гледаат.
+5. За излез, кликни на прозорецот „Minecraft Gesture Control“ и притисни **Esc**.
+
+> Сликата од камерата е огледална. Левата рака треба да биде на левата страна од екранот, а десната на десната.
+
+---
+
+## Контроли
+
+### Лева рака – движење и акции
+
+| Акција | Гест | Копче |
+|---|---|---|
+| Напред | Показалец нагоре ☝️ | `W` |
+| Назад | Показалец + среден прст нагоре ✌️ | `S` |
+| Десно | Показалец насочен надесно 👉 | `D` |
+| Лево | Показалец + среден прст насочени надесно | `A` |
+| Скок (во место) | Палец нагоре 👍 | `Space` |
+| Шуњање (во место) | Палец + мал прст 🤙 | `Shift` |
+| Кршење блок | Показалец + мал прст 🤘 (палецот долу) | Лев клик (држење) |
+| Поставување блок | Само мал прст | Десен клик |
+| Инвентар | Отворена дланка 🖐️ | `E` |
+| Одмор (се пушта сè) | Тупаница 👊 | – |
+
+### Лева рака – додатоци додека се движиш
+
+Додека правиш било кој гест за движење (напред, назад, лево, десно), можеш да додадеш:
+
+| Додаток | Што правиш | Резултат |
+|---|---|---|
+| Скок | Крени го и палецот | Се движиш и скокаш додека палецот е горе |
+| Шуњање | Крени ги палецот и малиот прст | Се движиш и се шуњаш додека се горе |
+
+Додека стоиш во место, скокот и шуњањето работат како порано (гестовите од горната табела).
+
+### Десна рака – гледање и hotbar
+
+| Акција | Гест |
+|---|---|
+| Гледање наоколу | Крени го показалецот и движи го. Камерата во играта го следи врвот на прстот |
+| Пауза на гледањето | Спушти го показалецот. Ја поместуваш раката без да се врти камерата |
+| Следен слот (десно) | Само мал прст нагоре |
+| Претходен слот (лево) | Само палец нагоре |
+
+Секое кревање на прстот поместува точно еден слот. За да поместиш уште еден, спушти го прстот и крени го пак.
+
+---
+
+## Совети
+
+- Гестовите се препознаваат и кога **дланката** и кога **надворешната страна на раката** е свртена кон камерата.
+- Новиот гест мора да се држи околу 0,1 секунда пред да се активира. Така еден погрешно прочитан кадар не те запира додека трчаш.
+- Кога кршиш блокови (показалец + мал прст), држи го **палецот долу**. Со палецот горе, тој гест значи „движење + шуњање“.
+- Добро осветлување и мирна позадина многу го подобруваат препознавањето.
+- На екранот е прикажано што програмата мисли дека прави секој прст, на пример `Left: T0 I1 M0 R0 P0` (палец, показалец, среден, домалец, мал прст). Тоа помага при подесување.
+
+---
+
+## Подесувања
+
+Сите подесувања се на почетокот од `minecraft_gestures.py`.
+
+| Подесување | Стандардно | Што прави |
+|---|---|---|
+| `MOUSE_SENSITIVITY` | `1.8` | Брзина на гледање наоколу |
+| `MOUSE_SMOOTHING` | `0.35` | Помало = помазно, поголемо = побрзо реагира |
+| `DEAD_ZONE` | `1.5` | Игнорира мали треперења на прстот. Помало = попрецизно нишање |
+| `GESTURE_CONFIRM_FRAMES` | `3` | Колку кадри мора да се држи гестот. Помало = побрзо, но повеќе грешки |
+| `BUILD_REPEAT_DELAY` | `0.6` | Секунди помеѓу поставување блокови. `0` = држи десен клик (за јадење, лак, штит) |
+| `SCROLL_COOLDOWN` | `0.25` | Најкраток интервал помеѓу две менувања на слотот |
+| `COOLDOWN` | `0.4` | Најкраток интервал помеѓу две отворања на инвентарот |
+| `FINGER_BEND_MAX` | `60` | Колку смее прстот да е свиткан за да се смета за крент |
+| `THUMB_OUT_RATIO` | `0.6` | Колку далеку треба да е палецот за да се смета за крент |
+| `USE_DEPTH` | `True` | Ја користи и длабочината од MediaPipe. `False` ако препознавањето трепери |
+| `HAND_ASSIGNMENT` | `"position"` | `"position"` = левата/десната рака според страната на екранот, `"label"` = според MediaPipe |
+| `MODEL_COMPLEXITY` | `1` | `0` = побрз, полесен модел (ако FPS е низок) |
+| `SHOW_FINGER_DEBUG` | `True` | Ја прикажува состојбата на прстите на екранот |
+
+---
+
+## Решавање проблеми
+
+| Проблем | Решение |
+|---|---|
+| Програмата притиска копчиња, но Minecraft не реагира | Кликни на прозорецот на Minecraft, за тој да биде активен |
+| Камерата во играта не се врти | Програмата работи само на Windows. Провери дали показалецот на десната рака е крент |
+| Палецот не се препознава | Намали го `THUMB_OUT_RATIO` |
+| Свиткан палец се смета за крент | Зголеми го `THUMB_OUT_RATIO` |
+| Исправени прсти не се препознаваат | Зголеми го `FINGER_BEND_MAX` |
+| Рацете се заменуваат | Држи ја секоја рака на својата страна од екранот |
+| Hotbar-от се движи во погрешна насока | Замени ги `-1` и `1` во двете `mouse.scroll` линии |
+| Низок FPS / доцнење | Стави `MODEL_COMPLEXITY = 0` |
+| Остануваат притиснати копчиња | Програмата ги пушта сите копчиња при излез, дури и ако падне. Ако сепак се случи, притисни го копчето еднаш рачно |
